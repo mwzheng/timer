@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 
 oneSecond = 1000  # 1000ms = 1s
 maxSeconds = 86400  # Max time in seconds allowed
@@ -6,6 +7,129 @@ defaultTime = 60  # Default time in seconds
 numRows = 10
 numCols = 10
 widgetList = {}  # Stores all the widgets created (Pixels, label)
+
+customImage = [
+    [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+    ],
+    [
+        "",
+        "",
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#09aa6c",
+        "#f28e02",
+        "",
+        "",
+        ""
+    ],
+    [
+        "",
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#09aa6c",
+        "#09aa6c",
+        "#09aa6c",
+        "#f28e02",
+        "",
+        ""
+    ],
+    [
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#09aa6c",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        ""
+    ],
+    [
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#e1f014",
+        "#f28e02",
+        ""
+    ],
+    [
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#e1f014",
+        "#f28e02",
+        ""
+    ],
+    [
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        ""
+    ],
+    [
+        "",
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "",
+        ""
+    ],
+    [
+        "",
+        "",
+        "",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "#f28e02",
+        "",
+        "",
+        ""
+    ],
+    [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+    ]
+]
 
 
 def createGUI(time):  # Creates the entire GUI
@@ -52,7 +176,7 @@ def validateTime(time):  # Checks if time input is valid, defaults to 60 if not
         return defaultTime
 
 
-def updateTime(miliSecLeft):
+def updateTime(miliSecLeft):  # Updates the rime label in the GUI
     if (miliSecLeft < 0):
         return
 
@@ -61,14 +185,55 @@ def updateTime(miliSecLeft):
     root.after(oneSecond, updateTime, miliSecLeft - oneSecond)
 
 
+def animate(pixelNumber, currentPixel, delay):  # Draws a singple pixel
+    if (currentPixel >= pixelNumber):
+        messagebox.showinfo("showinfo", "Times up!")
+        root.destroy()
+        return
+
+    row, col, color = coordinates[currentPixel]
+
+    changePixelColor(row, col, color)
+
+    root.after(delay, animate, pixelNumber, currentPixel + 1, delay)
+
+
+def changePixelColor(row, col, color):  # Changes the color of a single pixel
+    pixel = widgetList[row+1, col]
+    pixel.config(highlightbackground=color)
+
+
+def getCoordinates():  # Get coordinates or pixels
+    coordinates = []
+
+    for row in range(0, len(customImage)):
+        for col in range(0, len(customImage[row])):
+            color = customImage[row][col]
+
+            if (color != "" and color != "#000000"):
+                coordinates.append((row, col, color))
+
+    return coordinates
+
+
 if __name__ == "__main__":
+    coordinates = getCoordinates()
+    pixelCount = len(coordinates)
+
     timeSet = input("Enter timer duration in seconds: ")
     timeSet = validateTime(timeSet)
 
     # Convert from sec to ms
     timeSet *= 1000
 
+    # Calculate delay before each pixel is placed
+    delay = int(timeSet/(pixelCount))
+
+    # Create the GUI
     root = createGUI(timeSet)
+
+    root.after(delay, animate, pixelCount, 0, delay)
+
     updateTime(timeSet)
 
     root.mainloop()
